@@ -1,0 +1,361 @@
+/*
+ *  World item constants
+ */
+const FOOD = 1;
+const WALL = -1;
+const BODY = -2;
+const FREE = 0;
+
+/*
+ * Direction Constants
+ */
+const UP = {Dx:0,Dy:-1};
+const DOWN = {Dx:0,Dy:1};
+const LEFT = {Dx:-1,Dy:0};
+const RIGHT = {Dx:1,Dy:0};
+
+/*
+    *   game over constants
+ */
+
+const WIN = 1;
+const LOSS = 0;
+
+
+class SnakeCanvas{
+
+    constructor(size){
+
+        document.querySelector('html').setAttribute('style','--point-size: calc(75vh / ' + size +')');
+
+        this.container = document.getElementById('container');
+
+        this.grid = SnakeCanvas.createMatrix(size);
+
+    }
+
+    addPoint(point){
+
+        this.container.appendChild(point.object);
+        this.grid[point.X][point.Y] = point;
+    }
+
+    size(){
+        return this.grid.length;
+    }
+
+    static createMatrix(size){
+
+        let result = [];
+        for(var i=0; i<size; i++) {
+            result[i] = new Array(size);
+            for(var j=0;j<size;j++){
+                result[i][j] = null;
+            }
+        }
+
+        return result;
+    }
+
+    addBody(body){
+
+        body.forEach((point) => {this.addPoint(point)});
+
+    }
+
+    replacePoint(x,y,point){
+
+        this.grid[point.X][point.Y] = null;
+
+        this.grid[x][y] = point;
+        point.X = x;
+        point.Y = y;
+
+    }
+
+    checkCoordinates(x,y){
+
+        if(x >= this.grid.length || y >= this.grid.length || y < 0 || x < 0){
+            return WALL;
+        }
+
+        if(this.grid[x][y] == null){
+            return FREE;
+        }
+
+        if(this.grid[x][y].isFood){
+            return FOOD;
+        }
+
+        return BODY;
+
+    }
+
+
+}
+
+class Point{
+
+    constructor(x,y,id){
+
+
+
+        this.object = document.createElement('div');
+        this.object.classList.add('point');
+        this.object.id = id;
+
+        this.X = x;
+        this.Y = y;
+
+        this.isFood = id === -1;
+    }
+
+    get X(){
+        return this.x;
+    }
+
+    set X(x){
+        this.object.style.marginLeft = 'calc(var(--point-size) * ' + x + ')';
+        this.x = x;
+    }
+
+    get Y(){
+        return this.y;
+    }
+
+    set Y(y){
+        this.object.style.marginTop = 'calc(var(--point-size) * ' + y + ')';
+        this.y = y;
+    }
+
+}
+
+
+
+class Snake{
+
+    constructor(world){
+        this.body = [new Point(1,1,0)];
+        this.direction = RIGHT;
+        this.possibleDirection = RIGHT;
+
+        this.world = world;
+        this.world.addBody(this.body);
+
+        this.food = new Food(this.world);
+    }
+
+    size(){
+        return this.body.length;
+    }
+
+    move(){
+
+        this.checkDirection();
+
+        let oldHead = this.body[this.size() - 1];
+        let newX = oldHead.X + this.direction.Dx;
+        let newY = oldHead.Y + this.direction.Dy;
+
+        if(this.world.checkCoordinates(newX,newY) === WALL){
+            newX = newX - this.direction.Dx * this.world.size();
+            newY = newY - this.direction.Dy * this.world.size();
+        }
+
+        if(this.world.checkCoordinates(newX,newY) === FOOD){
+
+            let returnValue = 10;
+
+            if(this.size() < (this.world.size() * this.world.size()) - 1) {
+                this.food.reappear();
+                returnValue = 1;
+            }
+
+            let newHead = new Point(newX,newY,this.size());
+            this.body.push(newHead);
+            this.world.addPoint(newHead);
+
+            return returnValue;
+        }
+
+        if(this.world.checkCoordinates(newX,newY) === FREE){
+            let newHead = this.body[0];
+            this.body.shift();
+            this.body.push(newHead);
+            this.world.replacePoint(newX,newY,newHead);
+
+            return 0;
+        }
+
+
+
+        return -1;
+    }
+
+    changeDirection(dir) {
+
+        this.possibleDirection = dir;
+    }
+
+    checkDirection(){
+
+        if(this.possibleDirection.Dx + this.direction.Dx === 0 && this.possibleDirection.Dy + this.direction.Dy === 0){
+            return;
+        }
+
+        this.direction = this.possibleDirection;
+
+    }
+
+
+}
+
+class Food{
+
+    constructor(world){
+
+        this.world = world;
+
+        let coordinates = this.randomCoordinate();
+
+        this.point = new Point(coordinates.X,coordinates.Y,-1);
+        this.world.addPoint(this.point);
+
+        this.point.object.classList.add('food');
+    }
+
+    randomCoordinate(){
+
+        let x = Math.round((Math.random() * 1000)) % this.world.size();
+        let y = Math.round((Math.random() * 1000)) % this.world.size();
+
+        while(this.world.grid[x][y] !== null){
+            x = Math.round((Math.random() * 1000)) % this.world.size();
+            y = Math.round((Math.random() * 1000)) % this.world.size();
+        }
+
+        return {X:x,Y:y};
+    }
+
+    reappear(){
+
+        let coordinates = this.randomCoordinate();
+
+        this.world.replacePoint(coordinates.X,coordinates.Y,this.point);
+
+    }
+
+}
+
+
+
+class Game{
+
+    constructor(snake,initSpeed){
+
+        this.snake = snake;
+        this.scoreBoard = document.getElementById('score');
+        this.speedBoard = document.getElementById('speed');
+
+        this.title = document.getElementById('title');
+
+        this.score = 0;
+        this.speed = initSpeed;
+        this.speedBoard.innerHTML = this.speed;
+
+        this.started = false;
+
+        this.play = () => {
+
+            console.log(this.snake);
+            let move = this.snake.move();
+
+            if(move === 1){
+
+                this.score += Math.round(this.speed * 10);
+                this.speed += 0.1;
+
+                this.scoreBoard.innerHTML = this.score;
+                this.speedBoard.innerHTML = this.speed.toPrecision(2);
+
+
+            }
+
+            if(move === -1){
+                this.gameOver(LOSS);
+                return;
+            }
+
+            if(move === 10){
+                this.gameOver(WIN);
+                return;
+            }
+
+            window.setTimeout(this.play,1000 / this.speed);
+        }
+
+    }
+
+
+
+    gameOver(result){
+        if(result === WIN){
+            document.querySelector('html').style.background = 'white';
+
+            this.title.innerHTML = 'YOU WIn MAN';
+        }
+
+        if(result === LOSS){
+            document.querySelector('html').style.background = 'black';
+
+
+
+            this.title.innerHTML = 'Is This Loss??';
+
+
+        }
+    }
+
+
+}
+
+
+
+let world = new SnakeCanvas(25);
+let snake = new Snake(world);
+let game = new Game(snake,3.0);
+
+window.addEventListener("keydown",function(e){
+
+    if(game.started === false){
+        document.getElementById('title').innerHTML = 'snake xenzia boi';
+        game.started = true;
+        game.play();
+    }
+    else{
+
+        switch(e.key){
+
+            case 'ArrowLeft': snake.changeDirection(LEFT);
+                return;
+
+            case 'ArrowUp': snake.changeDirection(UP);
+                return;
+
+            case 'ArrowDown': snake.changeDirection(DOWN);
+                return;
+
+            case 'ArrowRight': snake.changeDirection(RIGHT);
+                return;
+
+            default: return;
+        }
+    }
+
+});
+
+
+
+
+
+//game.play();
