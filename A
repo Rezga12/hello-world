@@ -1,3 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake Xenzia</title>
+    <link rel = 'stylesheet' href="styles.css">
+    <script type = 'text/javascript' src = 'SGraphic.js' async></script>
+</head>
+<body>
+
+    <div class = 'title' id = 'title'>press Any key</div>
+
+
+
+
+    <div class ='container' id = 'container'>
+
+
+
+    </div>
+
+    <div class = 'score-board'>
+
+        <div class = 'score'><span class = 'label'>score:</span> <span id = 'score'>0</span></div>
+
+        <div class = 'score'><span class = 'label'>speed:</span> <span id = 'speed'>1</span></div>
+
+    </div>
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+html{
+    --bg-color: #181712;
+    --pt-color: #B0ABA0;
+    --fd-color: #F0F0F0;
+
+    background: var(--bg-color);
+    --point-size: 0;
+
+    font-family: digital-font, serif;
+}
+
+.container{
+
+    border: 1px solid var(--pt-color);
+    height: 75vh;
+    width: 75vh;
+    margin-top: 20vh;
+    margin-left: calc(50vw - 38vh);
+
+    position: relative;
+
+}
+
+.point{
+
+    background: var(--pt-color);
+    width: var(--point-size);
+    height: var(--point-size);
+
+    border-radius: 15%;
+
+    position: absolute;
+
+}
+
+.food{
+
+    background: var(--fd-color);
+    border-radius: 50%;
+}
+
+@font-face{
+    font-family:digital-font;
+    src: url('./fonts/digital-7.ttf');
+}
+
+
+.score-board{
+
+
+
+    text-align: center;
+    color: var(--pt-color);
+
+    position: absolute;
+
+    top:18vh;
+    right: 10vw;
+}
+
+.score{
+    font-size: 5vw;
+}
+
+.label{
+    font-size: 75%;
+}
+
+.title{
+
+    position: absolute;
+    width: 50vw;
+    margin-left: 25vw;
+    text-align: center;
+    font-size: 4vw;
+    color: var(--pt-color);
+    top: 20px;
+
+}
+
+
+
+
+
+
+
 /*
  *  World item constants
  */
