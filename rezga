@@ -1,0 +1,95 @@
+const express = require("express");
+const app = express();
+const serve = require('express-static');
+const port = 3123;
+
+//app.use(serve(__dirname + '/index.html'))
+
+//app.get('/',(req,res) => console.log('asdasdsd'));
+
+//app.listen(port,() => console.log(port));
+
+
+
+const WS = require('ws');
+
+
+
+const server = app.listen(3123);
+
+const webSocket = new WS.Server({server});
+//webSocket.on('error', (err) =>);
+webSocket.on('connection', (client) => {
+
+	client.send('hello client');
+
+
+	client.on('message', (message) => {
+		client.send(message);
+		console.log(message);
+	})
+});
+
+
+webSocket.on('message', (event) => {
+
+	console.log('lel');
+
+});
+//////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Title Man</title>
+
+		<script type="text/javascript" async>
+			
+
+			const webSocket = new WebSocket('ws://localhost:3123');
+
+			webSocket.addEventListener('open',(event) => {
+					console.log('logging');
+					
+
+			});
+
+			webSocket.addEventListener('message', (event) => {
+					console.log("mes: " + event.data);
+			});
+
+			function f(){
+
+				let k = document.getElementById('1').value;
+				webSocket.send(k);
+			}
+
+		</script>
+
+	
+	
+
+</head>
+
+<body>
+	gOOD sYTRE
+
+	<input id = '1' type= "text" name="">
+	<button onclick="f()">oe</button>
+
+</body>
+</html>
+
+
+
+
