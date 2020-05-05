@@ -12,6 +12,9 @@ export class SnakeCanvas{
 
     }
 
+
+    //adding comment in canvas
+
     addPoint(point){
 
         this.container.appendChild(point.object);
