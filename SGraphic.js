@@ -8,7 +8,7 @@ class Game{
 
         this.scoreBoard = document.getElementById('score');
         this.speedBoard = document.getElementById('speed');
-
+        this.asd = 12;
         this.title = document.getElementById('title');
 
         this.score = 0;
