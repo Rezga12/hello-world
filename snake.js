@@ -56,6 +56,7 @@ export class Snake{
             return 0;
         }
 
+        var a = 123;
 
 
         return -1;
