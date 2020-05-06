@@ -21,3 +21,7 @@ export const RIGHT = {Dx:1,Dy:0};
 export const WIN = 1;
 export const LOSS = 0;
 
+
+//some lines
+
+export const rezo = 123;

@@ -56,7 +56,8 @@ export class Snake{
             return 0;
         }
 
-
+        const a = 123;
+        const b = 123 - a;
 
         return -1;
     }
